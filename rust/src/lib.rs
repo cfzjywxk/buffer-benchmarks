@@ -1,5 +1,5 @@
 mod constants;
 
-pub mod protobuf;
-pub mod prost;
 pub mod flatbuffers;
+pub mod prost;
+pub mod protobuf;

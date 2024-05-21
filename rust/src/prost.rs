@@ -8,7 +8,7 @@ mod generated {
     include!(concat!(env!("OUT_DIR"), "/generated.rs"));
 }
 
-pub fn encode() -> Vec<u8> {
+pub fn prepare_msg() -> generated::Message {
     let md = generated::MessageData {
         body: Some(generated::message_data::Body::CastAddBody(
             generated::CastAddBody {
@@ -32,18 +32,20 @@ pub fn encode() -> Vec<u8> {
     md_buf.reserve(md.encoded_len());
     md.encode(&mut md_buf).unwrap();
 
-    let m = generated::Message {
+    generated::Message {
         data: md_buf,
         hash: Vec::from(constants::SAMPLE_HASH),
         hash_scheme: generated::HashScheme::Blake3.into(),
         signature: Vec::from(constants::SAMPLE_SIGNATURE),
         signature_scheme: generated::SignatureScheme::Ed25519.into(),
         signer: Vec::from(constants::SAMPLE_SIGNER),
-    };
+    }
+}
+pub fn encode(m: &impl Message) -> Vec<u8> {
     let mut m_buf = Vec::new();
     m_buf.reserve(m.encoded_len());
     m.encode(&mut m_buf).unwrap();
-    m_buf.into()
+    m_buf
 }
 
 pub fn decode(buf: &[u8]) {

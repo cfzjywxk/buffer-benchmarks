@@ -1,10 +1,11 @@
 mod message_generated;
 
 use crate::constants;
+use flatbuffers::FlatBufferBuilder;
 
 use self::message_generated::farcaster as generated;
 
-pub fn encode() -> Vec<u8> {
+pub fn prepare_msg() -> Vec<u8> {
     let mut mdb = flatbuffers::FlatBufferBuilder::with_capacity(1024);
 
     let text = mdb.create_string(constants::SAMPLE_TEXT);
@@ -47,9 +48,12 @@ pub fn encode() -> Vec<u8> {
     );
 
     mdb.finish(message_data, None);
+    Vec::from(mdb.finished_data())
+}
 
+pub fn encode(data: &[u8]) -> FlatBufferBuilder {
     let mut mb = flatbuffers::FlatBufferBuilder::with_capacity(1024);
-    let data = mb.create_vector(mdb.finished_data());
+    let data = mb.create_vector(data);
     let hash = mb.create_vector(&constants::SAMPLE_HASH);
     let signature = mb.create_vector(&constants::SAMPLE_SIGNATURE);
     let signer = mb.create_vector(&constants::SAMPLE_SIGNER);
@@ -68,7 +72,8 @@ pub fn encode() -> Vec<u8> {
     );
 
     mb.finish(message, None);
-    Vec::from(mb.finished_data())
+    mb
+    //Vec::from(mb.finished_data())
 }
 
 pub fn decode(buf: &[u8]) {

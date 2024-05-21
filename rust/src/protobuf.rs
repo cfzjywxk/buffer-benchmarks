@@ -7,7 +7,7 @@ use protobuf::Message;
 use self::codegen::message as generated;
 use crate::constants;
 
-pub fn encode() -> Vec<u8> {
+pub fn prepare_msg() -> generated::Message {
     let md = generated::MessageData {
         body: Some(generated::message_data::Body::CastAddBody(
             generated::CastAddBody {
@@ -32,7 +32,7 @@ pub fn encode() -> Vec<u8> {
     };
     let md_buf = md.write_to_bytes().unwrap();
 
-    let m = generated::Message {
+    generated::Message {
         data: md_buf,
         hash: Vec::from(constants::SAMPLE_HASH),
         hash_scheme: generated::HashScheme::Blake3.into(),
@@ -40,7 +40,10 @@ pub fn encode() -> Vec<u8> {
         signature_scheme: generated::SignatureScheme::Ed25519.into(),
         signer: Vec::from(constants::SAMPLE_SIGNER),
         special_fields: Default::default(),
-    };
+    }
+}
+
+pub fn encode(m: &generated::Message) -> Vec<u8> {
     m.write_to_bytes().unwrap()
 }
 
